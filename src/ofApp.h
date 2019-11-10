@@ -3,6 +3,8 @@
 #include "ofMain.h"
 #include "ofxGui.h"
 
+#define NUM 5 //sensorの数
+
 class ofApp : public ofBaseApp{
 
 	public:
@@ -22,11 +24,26 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
     
+        ofParameter<int> sensor[5]; //parameter色表現テスト用
+//        ofParameter<float> sensor2; //parameter色表現テスト用
+//        ofParameter<float> sensor3; //parameter色表現テスト用
+//        ofParameter<float> sensor4; //parameter色表現テスト用
+//        ofParameter<float> sensor5; //parameter色表現テスト用
+
+        ofVec2f pos[NUM]; //sensorの表記をする位置ベクトルの配列
+    
+    
         ofxPanel gui;
         ofxFloatSlider radius;
         ofxColorSlider color;
         ofxVec2Slider position;
         ofPolyline plot;
+    
+        float scale, offsetX, offsetY;
+    
         float x;
         float y;
+    
+        int mposx;
+        int mposy;
 };

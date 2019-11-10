@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
 <group>
-	<radius>200</radius>
-	<color>165, 95, 167, 255</color>
-	<position>611.265, 325.224</position>
+	<radius>38</radius>
+	<color>0, 255, 255, 255</color>
+	<position>1263.67, 645.878</position>
+	<value>128</value>
+	<sensor1>61</sensor1>
+	<sensor2>128</sensor2>
 </group>

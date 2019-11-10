@@ -1,12 +1,13 @@
 #include "ofApp.h"
 
-//float
 
-//--------------------------------------------------------------
 void ofApp::setup(){
-    
+    //画面の描画についてフレッシュレートとシンク設定
+    ofSetVerticalSync(true);
     ofSetFrameRate(60);
-    ofBackground(255);
+//    ofBackground(255);
+
+//    円のレゾリューション
     ofSetCircleResolution(64);
     
     ofColor initColor = ofColor(0,255,255,255);
@@ -17,11 +18,30 @@ void ofApp::setup(){
     ofVec2f minPos = ofVec2f(0,0);
     ofVec2f maxPos = ofVec2f(ofGetWidth(),ofGetHeight());
     
+    //sensor分繰り返し
+    for(int i=0; i<NUM; i++){
+        pos[i].x = ofGetWidth()*(i+1)/(NUM+1);
+        pos[i].y = ofGetHeight()/2;}
+
+    
+    sensor[0].set("sensor1", 128,0,255); //name, default, min, max
+    sensor[1].set("sensor2", 128,0,255); //name, default, min, max
+//    sensor3.set("sensor3", 128,0,255); //name, default, min, max
+//    sensor4.set("sensor4", 128,0,255); //name, default, min, max
+//    sensor5.set("sensor5", 128,0,255); //name, default, min, max
+
+    
     gui.setup();
-    gui.add(radius.setup("radius", 200, 0, 400));
+    gui.add(radius.setup("radius", 30, 0, 100));
     gui.add(color.setup("color", initColor, minColor,maxColor));
     gui.add(position.setup("position", initPos, minPos, maxPos));
-    
+    gui.add(sensor[0]);
+    gui.add(sensor[1]);
+//    gui.add(sensor2);
+//    gui.add(sensor3);
+//    gui.add(sensor4);
+//    gui.add(sensor5);
+
     x=0;
     y=0;
 }
@@ -34,36 +54,58 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+      ofBackgroundGradient(ofColor::white, ofColor::gray);
+      
+//    ofDrawCircle(ofVec2f(position), radius);
+
+//    for (int i=0; i<5; i++)
+//    {
+//
+//        int value = i;
+//        ofSetColor(value, 0, 255-value);
+//    }
     
-    ofDrawCircle(ofVec2f(position), radius);
+    for (int i=0; i<NUM; i++){
+    ofSetColor(sensor[0], 0, 255-sensor[0]);
+    ofDrawCircle(pos[i],radius);
+    }
+
+
+    
+//    Debug for mouse event
+    ofSetColor(0, 0, 0);
+    string msg = "mposx:" + ofToString(mposx)+'\n';
+//    msg += "mouse Position" + ofToString(mposx)+'\n';
+    ofDrawBitmapString(msg, ofGetWidth()-120,20);
+
+    string msg2 = "mposy:" + ofToString(mposy)+'\n';
+    //    msg += "mouse Position" + ofToString(mposx)+'\n';
+        ofDrawBitmapString(msg2, ofGetWidth()-120,40);
+    
     gui.draw();
     
-    ofSetColor(color);
-//    ofDrawRectangle(ofGetWidth()*0.1,ofGetHeight()*0.1,x,y);
-//    ofPolyline(10,10,10);
-//    ofPolyline(10,100,100);
-    
-    
-//        plot.addVertex(x,y);
-//        plot.draw();
-
-    //
-//    float i = 0;
-//    while (i < radius) { // make a heart
-////        float r = (2-2*sin(i) + sin(i)*sqrt(abs(cos(i))) / (sin(i)+1.4)) * -80;
-//        float x = i;
-//        float y = ofGetHeight()/2 + sin(i);
-//        plot.addVertex(ofVec3f(x,x,0));
-//        i+=1;
-//        plot.draw();
-//    }
-//    plot.close();
-    
+//    ofSetColor(color);
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
+    switch (key){
+        //fでフルスクリーン
+        case 'f':
+            ofToggleFullscreen();
+             break;
+            
+        //sでパラメータ記録
+        case 's':
+            gui.saveToFile("settings.xml");
+            break;
+            
+        //lでパラメータ読み込み
+        case 'l':
+            gui.loadFromFile("settings.xml");
+            break;
 
+    }
 }
 
 //--------------------------------------------------------------
@@ -83,7 +125,15 @@ void ofApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
+ 
+    if (pos[0].x - radius < x && x < pos[0].x+radius){
+        mposx = x;
+          }
+   if (pos[0].y - radius < y && y < pos[0].y+radius){
+          mposy = y;
+            }
 
+    
 }
 
 //--------------------------------------------------------------
