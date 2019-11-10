@@ -75,12 +75,13 @@ void ofApp::draw(){
 //    Debug for mouse event
     ofSetColor(0, 0, 0);
     string msg = "mposx:" + ofToString(mposx)+'\n';
-//    msg += "mouse Position" + ofToString(mposx)+'\n';
     ofDrawBitmapString(msg, ofGetWidth()-120,20);
 
     string msg2 = "mposy:" + ofToString(mposy)+'\n';
-    //    msg += "mouse Position" + ofToString(mposx)+'\n';
         ofDrawBitmapString(msg2, ofGetWidth()-120,40);
+ 
+    string msg3 = "sCircle:" + ofToString(selectCircle)+'\n';
+         ofDrawBitmapString(msg3, ofGetWidth()-120,60);
     
     gui.draw();
     
@@ -104,7 +105,12 @@ void ofApp::keyPressed(int key){
         case 'l':
             gui.loadFromFile("settings.xml");
             break;
-
+        
+        //Radiusを40にセットするテスト用
+        case 'a':
+            radius=40;
+            break;
+            
     }
 }
 
@@ -126,14 +132,15 @@ void ofApp::mouseDragged(int x, int y, int button){
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
  
-    if (pos[0].x - radius < x && x < pos[0].x+radius){
+    for (int i=0; i<NUM; i++){
+    if (pos[i].x - radius < x && x < pos[i].x+radius && pos[i].y - radius < y && y < pos[i].y+radius){
         mposx = x;
-          }
-   if (pos[0].y - radius < y && y < pos[0].y+radius){
-          mposy = y;
+        mposy = y;
+        selectCircle = i;
+        position =ofVec2f(pos[i].x,pos[i].y);
             }
+    }
 
-    
 }
 
 //--------------------------------------------------------------

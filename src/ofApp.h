@@ -39,11 +39,13 @@ class ofApp : public ofBaseApp{
         ofxVec2Slider position;
         ofPolyline plot;
     
-        float scale, offsetX, offsetY;
-    
         float x;
         float y;
-    
+        
+        //マウスのクリック箇所の判定用
         int mposx;
         int mposy;
+
+        //選択した円の番号
+        int selectCircle;
 };
