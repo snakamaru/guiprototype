@@ -66,6 +66,14 @@ void ofApp::draw(){
 //    }
     
     for (int i=0; i<NUM; i++){
+        if (selectCircle ==i )
+        {
+         pos[i].x = x;
+         pos[i].y = y;
+        }
+    }
+    
+    for (int i=0; i<NUM; i++){
     ofSetColor(sensor[0], 0, 255-sensor[0]);
     ofDrawCircle(pos[i],radius);
     }
@@ -111,7 +119,22 @@ void ofApp::keyPressed(int key){
             radius=40;
             break;
             
+//        case 'k':
+//            position =ofVec2f(pos[selectCircle].x+1,pos[selectCircle].y);
+//            break;
     }
+    
+    //もし押されたキーがキーコードだったら処理を実行する。
+    if(key == 'k') {//右に動く
+        position =ofVec2f(pos[selectCircle].x+3,pos[selectCircle].y);
+      }
+       else if (key == 'j') {    //左に動く
+        position =ofVec2f(pos[selectCircle].x-3,pos[selectCircle].y);
+      }else if (key == 'i') {    //上に動く
+        position =ofVec2f(pos[selectCircle].x,pos[selectCircle].y-3);
+      }else if (key == 'n') {    //下に動く
+        position =ofVec2f(pos[selectCircle].x,pos[selectCircle].y+3);
+      }
 }
 
 //--------------------------------------------------------------

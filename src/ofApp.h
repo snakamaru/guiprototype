@@ -47,5 +47,5 @@ class ofApp : public ofBaseApp{
         int mposy;
 
         //選択した円の番号
-        int selectCircle;
+        int selectCircle =NUM+1;
 };
