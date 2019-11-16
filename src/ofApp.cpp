@@ -6,6 +6,8 @@ void ofApp::setup(){
     ofSetVerticalSync(true);
     ofSetFrameRate(60);
 //    ofBackground(255);
+    
+    myTextFile.open("text.csv",ofFile::WriteOnly);
 
 //    円のレゾリューション
     ofSetCircleResolution(64);
@@ -26,7 +28,7 @@ void ofApp::setup(){
     
     sensor[0].set("sensor1", 128,0,255); //name, default, min, max
     sensor[1].set("sensor2", 128,0,255); //name, default, min, max
-//    sensor3.set("sensor3", 128,0,255); //name, default, min, max
+    sensor[2].set("sensor3", 128,0,255); //name, default, min, max
 //    sensor4.set("sensor4", 128,0,255); //name, default, min, max
 //    sensor5.set("sensor5", 128,0,255); //name, default, min, max
 
@@ -37,34 +39,89 @@ void ofApp::setup(){
     gui.add(position.setup("position", initPos, minPos, maxPos));
     gui.add(sensor[0]);
     gui.add(sensor[1]);
-//    gui.add(sensor2);
+    gui.add(sensor[2]);
 //    gui.add(sensor3);
 //    gui.add(sensor4);
 //    gui.add(sensor5);
 
+    //positionへの値入力初期値
     x=0;
     y=0;
+
+
+    // Arduinoの接続に必要なポート情報
+    ard.connect("/dev/cu.usbmodem142101", 57600);
+    
+    // 初期接続の確認フラグ
+    // listen for EInitialized notification. this indicates that
+    // the arduino is ready to receive commands and it is safe to
+    // call setupArduino()
+    ofAddListener(ard.EInitialized, this, &ofApp::setupArduino);
+    bSetupArduino    = false;
+    // flag so we setup arduino when its ready, you don't need to touch this :)
+    
 }
 
+//--------------------------------------------------------------
+void ofApp::setupArduino(const int & version){
+    // remove listener because we don't need it anymore
+    ofRemoveListener(ard.EInitialized, this, &ofApp::setupArduino);
+    // it is now safe to send commands to the Arduino
+    
+    
+    // print firmware name and version to the console
+    ofLogNotice() << ard.getFirmwareName();
+    ofLogNotice() << "firmata v" << ard.getMajorFirmwareVersion() << "." << ard.getMinorFirmwareVersion();
+    
+    // Note: pins A0 - A5 can be used as digital input and output.
+    // Refer to them as pins 14 - 19 if using StandardFirmata from Arduino 1.0.
+    // If using Arduino 0022 or older, then use 16 - 21.
+    // Firmata pin numbering changed in version 2.3 (which is included in Arduino 1.0)
+    
+    //    ピンのアサインを決める
+    for (int i=0; i<6; i++){
+        //A0-A5をアナログインプットに指定
+        ard.sendAnalogPinReporting(i, ARD_ANALOG);
+    }
+    
+    //set up 状態の判定
+    bSetupArduino = true;
+    
+    
+}
+//--------------------------------------------------------------
+void ofApp::updateArduino(){
+    //
+    ard.update();
+    
+}
+
+//--------------------------------------------------------------
 //--------------------------------------------------------------
 void ofApp::update(){
     x=position->x;
     y=position->y;
+    updateArduino();
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
       ofBackgroundGradient(ofColor::white, ofColor::gray);
       
-//    ofDrawCircle(ofVec2f(position), radius);
+    //Arduinoのメッセージ出力
+     string msg ="";
+     for(int i=0; i<6;i++){
+         msg += "Analog IN" + ofToString(i,0) + ":" + ofToString(ard.getAnalog(i),0)+'\n';
+     }
+     ofSetHexColor(0xFFFFFF);
+     ofDrawBitmapString(msg, 20,20);
 
-//    for (int i=0; i<5; i++)
-//    {
-//
-//        int value = i;
-//        ofSetColor(value, 0, 255-value);
-//    }
+    //sensor[]にArduinoの値を代入
+    sensor[0]=ard.getAnalog(0)/4; //sensor1
+    sensor[1]=ard.getAnalog(1)/4; //sensor2
+    sensor[2]=ard.getAnalog(2)/4; //sensor3
     
+    //選択された円の場所を更新
     for (int i=0; i<NUM; i++){
         if (selectCircle ==i )
         {
@@ -82,14 +139,14 @@ void ofApp::draw(){
     
 //    Debug for mouse event
     ofSetColor(0, 0, 0);
-    string msg = "mposx:" + ofToString(mposx)+'\n';
-    ofDrawBitmapString(msg, ofGetWidth()-120,20);
+    string mss = "mposx:" + ofToString(mposx)+'\n';
+    ofDrawBitmapString(mss, ofGetWidth()-120,20);
 
-    string msg2 = "mposy:" + ofToString(mposy)+'\n';
-        ofDrawBitmapString(msg2, ofGetWidth()-120,40);
+    string mss2 = "mposy:" + ofToString(mposy)+'\n';
+        ofDrawBitmapString(mss2, ofGetWidth()-120,40);
  
-    string msg3 = "sCircle:" + ofToString(selectCircle)+'\n';
-         ofDrawBitmapString(msg3, ofGetWidth()-120,60);
+    string mss3 = "sCircle:" + ofToString(selectCircle)+'\n';
+         ofDrawBitmapString(mss3, ofGetWidth()-120,60);
     
     gui.draw();
     
@@ -105,8 +162,14 @@ void ofApp::keyPressed(int key){
              break;
             
         //sでパラメータ記録
+//        case 's':
+//            gui.saveToFile("settings.xml");
+//            break;
+//
+            
         case 's':
-            gui.saveToFile("settings.xml");
+            myTextFile.open("text.csv",ofFile::Append);
+            myTextFile << "some text"<< endl;
             break;
             
         //lでパラメータ読み込み
@@ -135,7 +198,31 @@ void ofApp::keyPressed(int key){
       }else if (key == 'n') {    //下に動く
         position =ofVec2f(pos[selectCircle].x,pos[selectCircle].y+3);
       }
+
+//    csvファイル保存コード
+//    if( key == 's' ){
+//       ofBuffer ofbuf;
+//       string str;
+//        vector<int>x;
+//       x.push_back(1);
+//       x.push_back(2);
+//       x.push_back(3);
+//       x.push_back(4);
+//       x.push_back(5);
+//
+//       for( int i = 0; i < x.size(); i++ ){
+//         str = str + ofToString(x[i]) + "\r\n"; // \r\nは改行コード
+//       }
+//
+//       ofbuf.append(str);
+//       ofBufferToFile(ofToDataPath("data.csv"), ofbuf);
+//     }
+
 }
+
+
+
+
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){

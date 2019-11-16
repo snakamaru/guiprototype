@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <group>
-	<radius>30</radius>
+	<radius>3.70117</radius>
 	<color>0, 255, 255, 255</color>
-	<position>696, 540</position>
+	<position>1280, 666</position>
 	<value>128</value>
-	<sensor1>128</sensor1>
+	<sensor1>86</sensor1>
 	<sensor2>128</sensor2>
 </group>

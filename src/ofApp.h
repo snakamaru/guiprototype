@@ -48,4 +48,23 @@ class ofApp : public ofBaseApp{
 
         //選択した円の番号
         int selectCircle =NUM+1;
+    
+        //Arduinoセットアップ情報
+        ofArduino    ard;
+        bool bSetupArduino;            // flag variable for setting up arduino once
+        
+    private:
+        
+        void setupArduino(const int & version);
+        void digitalPinChanged(const int & pinNum);
+        void analogPinChanged(const int & pinNum);
+        void updateArduino();
+    
+    //ファイル保存用
+    ofFile myTextFile;
+    
+    //UI 背景画像
+    ofImage footshape;
+    
+    
 };
